@@ -1,162 +1,87 @@
-# LLM-Based Invoice OCR
+# 🧾 InvoiceParser AI
 
-A hybrid Invoice OCR pipeline that extracts structured JSON data from invoices using OCR + LLMs. This project demonstrates an end-to-end intelligent document processing workflow with support for both paid API-based extraction and open-source OCR fallback.
+A hybrid Invoice OCR pipeline that extracts structured JSON data from invoices. This project demonstrates an end-to-end intelligent document processing pipeline.
 
-## Demo
+## 🎬 Demo
 
-🎬 Demo Video:
-https://drive.google.com/file/d/17MpFdzs3mrm-jd801CzsPZ-NdsQOmw6s/view?usp=drive_link
-
----
-
-## Features
-
-* Accepts PDF or image uploads
-* Supports multi-page PDF processing
-* Converts PDFs into images using `pdf2image`
-* Extracts structured invoice data such as:
-
-  * Invoice Number
-  * Vendor Name
-  * Invoice Date
-  * Line Items
-  * Subtotal
-  * Tax
-  * Grand Total
-  * Payment Terms
-  * Billing Details
-* Returns clean structured JSON output
-* Supports both:
-
-  * Paid API Mode
-  * Open-Source OCR Mode
-* Includes sample invoices for testing and demo purposes
+📹 [Watch Demo](https://drive.google.com/file/d/17MpFdzs3mrm-jd801CzsPZ-NdsQOmw6s/view?usp=drive_link)
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-### Backend
-
-* FastAPI
-
-### Frontend
-
-* Gradio
-
-### OCR
-
-* pdf2image
-* Tesseract OCR (`pytesseract`)
-* Together AI API
-
-### Language Model
-
-* Qwen2.5-VL-72B-Instruct
+- 📄 Accepts **PDF or image uploads** (`pdf2image` used to convert PDFs)
+- 📑 **Multi-page PDFs** supported (each page converted to an image and processed)
+- 🔍 Extracts structured data: `invoice_number`, `vendor_name`, `invoice_date`, `line_items`, `grand_total`, etc.
+- 🔀 Switch between **Paid API** and **Open-source OCR** modes
+- 📦 Returns clean, structured **JSON**
+- 🧪 Sample invoices included for testing/demo
 
 ---
 
-## Extraction Modes
+## 🛠️ Tech Stack
 
-### Paid Mode
+| Layer | Technology |
+|-------|-----------|
+| Backend | FastAPI |
+| Frontend | Gradio |
+| OCR (open-source) | pdf2image + Tesseract |
+| OCR (paid) | Together AI — `Qwen2.5-VL-72B-Instruct` |
 
-Uses Together AI API with Qwen2.5-VL-72B-Instruct for high-accuracy invoice extraction directly from invoice images.
+### Modes
 
-### Open-Source Mode
-
-Uses Tesseract OCR with rule-based heuristics for a completely free fallback option.
+| Mode | Description |
+|------|-------------|
+| `paid` | Uses Together AI (`Qwen2.5-VL-72B-Instruct`) to extract structured JSON from invoice images |
+| `open_source` | Uses `pytesseract` OCR + heuristics as a free fallback option |
 
 ---
 
-## Installation
+## 🚀 Quickstart
 
-### Step 1: Create Virtual Environment
+### 1. Create a virtual environment and install dependencies
 
-### Windows (PowerShell)
-
+**Windows (PowerShell):**
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### macOS / Linux
-
+**macOS/Linux:**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 ---
 
-## Step 2: Install Required Tools
+### 2. Install prerequisites
 
-### Poppler (Required for PDF to Image Conversion)
+#### Poppler *(required for PDF → image conversion)*
 
-### Windows
+| OS | Command |
+|----|---------|
+| Windows | Download from [poppler-windows releases](https://github.com/oschwartz10612/poppler-windows/releases), unzip to `C:\poppler\poppler-23.08.0`, ensure `Library\bin` exists |
+| macOS | `brew install poppler` |
+| Ubuntu/Debian | `sudo apt install poppler-utils` |
 
-Download from:
-https://github.com/oschwartz10612/poppler-windows/releases
+#### Tesseract *(recommended for open-source OCR mode)*
 
-Example path:
-
-```text
-C:\poppler\poppler-23.08.0
-```
-
-Make sure the `Library/bin` folder exists.
-
-### macOS
-
-```bash
-brew install poppler
-```
-
-### Ubuntu / Debian
-
-```bash
-sudo apt install poppler-utils
-```
+| OS | Command |
+|----|---------|
+| Windows | Install from [tesseract-ocr](https://github.com/tesseract-ocr/tesseract), ensure it's added to PATH |
+| macOS | `brew install tesseract` |
+| Ubuntu/Debian | `sudo apt install tesseract-ocr` |
 
 ---
 
-### Tesseract OCR (Recommended for Open-Source Mode)
+### 3. Configure environment variables
 
-### Windows
-
-Install from:
-https://github.com/tesseract-ocr/tesseract
-
-Example path:
-
-```text
-C:\Program Files\Tesseract-OCR\tesseract.exe
-```
-
-Ensure Tesseract is added to PATH.
-
-### macOS
-
-```bash
-brew install tesseract
-```
-
-### Ubuntu / Debian
-
-```bash
-sudo apt install tesseract-ocr
-```
-
----
-
-## Step 3: Configure Environment Variables
-
-Copy `.env.example` to `.env`
+Copy `.env.example` to `.env` and set values as needed *(only the API key is required for paid mode)*:
 
 ```env
 TOGETHER_API_KEY="your_api_key_here"
@@ -164,153 +89,70 @@ TOGETHER_MODEL="Qwen/Qwen2.5-VL-72B-Instruct"
 TOGETHER_INFERENCE_URL="https://api.together.xyz/v1/chat/completions"
 ```
 
----
+> **Windows only:** If Poppler is not on PATH, set `POPPLER_PATH`:
+> ```powershell
+> # Current session
+> $env:POPPLER_PATH = "C:\\poppler\\poppler-23.08.0\\Library\\bin"
+> ```
+> Or set it permanently via **System Properties → Environment Variables**.
 
-## Optional Windows Configuration
-
-### Set POPPLER_PATH
-
-If Poppler is not added to PATH:
-
-```powershell
-$env:POPPLER_PATH = "C:\poppler\poppler-23.08.0\Library\bin"
-```
-
-You can also set it permanently via Environment Variables.
+> **Tesseract (open_source mode):** Ensure Tesseract is on PATH, or manually set:
+> ```python
+> pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+> ```
 
 ---
 
-### Set Tesseract Path Manually (if needed)
-
-```python
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-```
-
----
-
-## Run the Application
-
-### Start Backend
+### 4. Run the backend (FastAPI)
 
 ```powershell
 uvicorn src.backend.main:app --reload
 ```
 
-Backend runs on:
-
-```text
-http://127.0.0.1:8000
-```
-
 ---
 
-### Start Frontend
+### 5. Run the frontend (Gradio)
 
-In another terminal:
+In a **second terminal** (with the same venv activated):
 
-```powershell
+```bash
 python src/frontend/gradio_app.py
 ```
 
-Frontend usually runs on:
+Open the Gradio UI at the URL printed in the terminal (typically `http://127.0.0.1:7860`). Try files from `sample_invoices/`.
 
-```text
-http://127.0.0.1:7860
+---
+
+## 🐛 Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| **Poppler not found / 500 error converting PDFs** | Ensure Poppler is installed and `POPPLER_PATH` points to its `Library\bin` folder (Windows) |
+| **Tesseract not found in `open_source` mode** | Add Tesseract to PATH or set `pytesseract.pytesseract.tesseract_cmd` to its full path |
+| **401/403 errors in `paid` mode** | Verify `TOGETHER_API_KEY` in `.env` and restart the backend |
+| **Connection failed between frontend and backend** | Confirm backend is running at `http://127.0.0.1:8000` before starting the frontend |
+| **Poor OCR quality (`open_source`)** | Try higher DPI scans — backend uses 300 DPI for PDF conversion by default |
+| **Multi-page PDFs** | Each page is processed and aggregated; response includes `pages` count |
+
+---
+
+## 📁 Project Structure
+
+```
+.
+├── src/
+│   ├── backend/
+│   │   └── main.py          # FastAPI app
+│   └── frontend/
+│       └── gradio_app.py    # Gradio UI
+├── sample_invoices/         # Sample PDFs/images for testing
+├── .env.example
+├── requirements.txt
+└── README.md
 ```
 
-Use sample files from:
-
-```text
-sample_invoices/
-```
-
 ---
 
-## Sample JSON Output
+## 📄 License
 
-```json
-{
-  "invoice_number": "INV-2025-104",
-  "vendor_name": "ABC Supplies Pvt Ltd",
-  "invoice_date": "2025-03-12",
-  "line_items": [
-    {
-      "description": "Office Chairs",
-      "quantity": 10,
-      "unit_price": 2500,
-      "total": 25000
-    }
-  ],
-  "grand_total": 29500
-}
-```
-
----
-
-## Troubleshooting
-
-### Poppler Not Found
-
-Make sure:
-
-* Poppler is installed correctly
-* `POPPLER_PATH` points to `Library/bin`
-
----
-
-### Tesseract Not Found
-
-Either:
-
-* Add Tesseract to PATH
-
-OR
-
-* Set the full path manually in code
-
----
-
-### Paid Mode Returns 401 / 403
-
-Verify:
-
-```env
-TOGETHER_API_KEY
-```
-
-Restart the backend after updating `.env`
-
----
-
-### Frontend Cannot Connect to Backend
-
-Ensure FastAPI backend is running before starting Gradio.
-
----
-
-### Poor OCR Quality
-
-Use:
-
-* Better quality invoice scans
-* Higher resolution PDFs
-
-(Default conversion DPI is 300)
-
----
-
-## Future Improvements
-
-* Excel / CSV export
-* Vendor-specific invoice templates
-* Database integration
-* Human-in-the-loop review system
-* Docker support
-* AWS / GCP deployment
-* Invoice validation workflows
-
----
-
-## Author
-
-Built as an Intelligent Document Processing project using OCR + LLM pipelines for real-world invoice automation.
+MIT License
